@@ -4,14 +4,10 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class FinanceManager {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in); // Об'єкт для зчитування введення користувача
-        DatabaseManager dbManager = new DatabaseManager(); // Робота з базою даних
-
-
-        // Основний цикл програми
+    // Метод для відображення та обробки головного меню
+    private static void mainMenu(Scanner scanner, DatabaseManager dbManager) {
         while (true) {
-            // Головне меню
+            // Відображення головного меню
             System.out.println("ГОЛОВНЕ МЕНЮ");
             System.out.println("1. Вхід\n2. Реєстрація\n3. Видалити користувача\n4. Вихід");
             try {
@@ -23,39 +19,7 @@ public class FinanceManager {
                     User user = InputHandler.login(scanner, dbManager);
                     if (user != null) {
                         // Після успішного входу відкривається меню користувача
-                        while (true) {
-                            System.out.println("1. Додати транзакцію\n2. Звіт\n3. Встановити ліміт\n4. Вийти");
-                            try {
-                                int userChoice = scanner.nextInt();
-                                scanner.nextLine(); // Очищення буфера
-
-                                if (userChoice == 1) {
-                                    // Створення нової транзакції
-                                    Transaction transaction = InputHandler.createTransaction(scanner, user.getId());
-                                    if (transaction != null) {
-                                        user.addTransaction(transaction); // Додавання транзакції до бюджету
-                                    }
-                                } else if (userChoice == 2) {
-                                    // Генерація та виведення фінансового звіту
-                                    System.out.println(user.getBudget().generateReport());
-                                } else if (userChoice == 3) {
-                                    // Зміна ліміту бюджету
-                                    System.out.println("Введіть новий ліміт витрат: ");
-                                    double limit = scanner.nextDouble();
-                                    user.getBudget().setLimit(limit, user.getId());
-                                    System.out.println("Новий ліміт витрат встановлено: " + limit);
-                                } else if (userChoice == 4) {
-                                    // Вихід до головного меню
-                                    break;
-                                } else {
-                                    System.out.println("Невірний вибір!");
-                                }
-                            } catch (Exception e) {
-                                // Обробка помилок вводу користувача
-                                System.out.println("Помилка: " + e.getMessage());
-                                scanner.nextLine(); // Очищення буфера після помилки
-                            }
-                        }
+                        userMenu(scanner, user);
                     }
                 } else if (choice == 2) {
                     // Реєстрація нового користувача
@@ -91,6 +55,51 @@ public class FinanceManager {
                 scanner.nextLine(); // Очищення буфера після помилки
             }
         }
+    }
+
+    // Метод для відображення та обробки меню користувача
+    private static void userMenu(Scanner scanner, User user) {
+        while (true) {
+            System.out.println("1. Додати транзакцію\n2. Звіт\n3. Встановити ліміт\n4. Вийти");
+            try {
+                int userChoice = scanner.nextInt();
+                scanner.nextLine(); // Очищення буфера
+
+                if (userChoice == 1) {
+                    // Створення нової транзакції
+                    Transaction transaction = InputHandler.createTransaction(scanner, user.getId());
+                    if (transaction != null) {
+                        user.addTransaction(transaction); // Додавання транзакції до бюджету
+                    }
+                } else if (userChoice == 2) {
+                    // Генерація та виведення фінансового звіту
+                    System.out.println(user.getBudget().generateReport());
+                } else if (userChoice == 3) {
+                    // Зміна ліміту бюджету
+                    System.out.println("Введіть новий ліміт витрат: ");
+                    double limit = scanner.nextDouble();
+                    user.getBudget().setLimit(limit, user.getId());
+                    System.out.println("Новий ліміт витрат встановлено: " + limit);
+                } else if (userChoice == 4) {
+                    // Вихід до головного меню
+                    break;
+                } else {
+                    System.out.println("Невірний вибір!");
+                }
+            } catch (Exception e) {
+                // Обробка помилок вводу користувача
+                System.out.println("Помилка: " + e.getMessage());
+                scanner.nextLine(); // Очищення буфера після помилки
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in); // Об'єкт для зчитування введення користувача
+        DatabaseManager dbManager = new DatabaseManager(); // Робота з базою даних
+
+        // Виклик головного меню
+        mainMenu(scanner, dbManager);
 
         scanner.close(); // Закриваємо Scanner перед виходом
     }
